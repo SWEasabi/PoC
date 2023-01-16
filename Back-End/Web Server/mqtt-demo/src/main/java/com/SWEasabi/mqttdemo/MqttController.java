@@ -47,32 +47,32 @@ public class MqttController {
 	  @PutMapping("/lamps/{id}")
 	  ResponseEntity<?> update(@PathVariable Long id, @RequestBody String message)
 	  {
-		  try {
+		try {
 
-			  Lamp temp = repository.findById(id).get();
-			  JsonObject rq = new Gson().fromJson(message, JsonObject.class);
-			  
-			  String newStatus = rq.get("status").getAsString();
-			  
-			  System.out.println("Lamp status: " + temp.getStatus());
-			  System.out.println("Message status: " + newStatus);
-			  
-			  if(!temp.getStatus().equals(newStatus))
-			  {
-				  temp.setStatus(newStatus);
-				  repository.save(temp);
-				  mqttGateway.sendToMqtt(newStatus, "lamps/" + id + "/stato");
-				  return ResponseEntity.ok("Eseguito l'update");
-			  }
-			  else
-			  {
-				  return ResponseEntity.ok("La lampadina è già in questo stato");
-			  }
-		  }
-		  catch(Exception ex)
-		  {
-			  return ResponseEntity.ok("Fallito l'update");
-		  }
+			Lamp temp = repository.findById(id).get();
+			JsonObject rq = new Gson().fromJson(message, JsonObject.class);
+			
+			String newStatus = rq.get("status").getAsString();
+			
+			System.out.println("Lamp status: " + temp.getStatus());
+			System.out.println("Message status: " + newStatus);
+			
+			if(!temp.getStatus().equals(newStatus))
+			{
+				temp.setStatus(newStatus);
+				repository.save(temp);
+				mqttGateway.sendToMqtt(newStatus, "lamps/" + id + "/stato");
+				return ResponseEntity.ok(new Gson().toJson("Eseguito l'update"));
+			}
+			else
+			{
+				return ResponseEntity.ok(new Gson().toJson("La lampadina è già in questo stato"));
+			}
+		}
+		catch(Exception ex)
+		{
+			return ResponseEntity.ok("Fallito l'update");
+		}
 	  }
 	  
 	  
