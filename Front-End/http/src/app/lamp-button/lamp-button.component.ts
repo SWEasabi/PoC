@@ -8,23 +8,16 @@ import { Component } from '@angular/core';
 })
 
 export class LampButtonComponent {
-  private isOn = false ; 
-  private lampStatus : any;
   constructor(private http: HttpClient) {}
   
 
   toggleLamp(){
     
     this.http.get<any>('http://localhost:8080/lamps/1',{responseType: 'json'}).subscribe(Response => {
-      this.lampStatus=Response;
-    })
-    
-    this.lampStatus = !this.lampStatus;
-    this.isOn = !this.isOn;
-
-    this.http.put<any>('http://localhost:8080/lamps/1',{responseType: 'json', status: this.isOn ? 'on' : 'off'})
-    .subscribe(Response => {
-      console.log(Response);
-    })
+      this.http.put<any>('http://localhost:8080/lamps/1',{responseType: 'json', status: Response.status == 'on' ? 'off' : 'on'})
+      .subscribe(Response => {
+        console.log(Response);
+      })
+    })   
   }
 }
