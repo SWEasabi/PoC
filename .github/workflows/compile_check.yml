@@ -1,12 +1,11 @@
-on: [
+on:
   push:
     branches:
       - docu-main
-, pull_request:
+  pull_request:
     branches:
       - docu-main
-]
-
+      
 jobs:
   build_docs:
     runs-on: ubuntu-latest
