@@ -27,13 +27,12 @@ public class MqttController {
 	    this.repository = repository;
 	  }
 	  
-	  
 	  @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 	  @GetMapping("/lamps")
 	  List<Lamp> all() {
 				System.out.println("List of lamps has been requested");
 				
-				mqttGateway.sendToMqtt("La lista delle lampade e' stata richiesta", "out");
+				mqttGateway.sendToMqtt("La lista delle lampade e' stata richiesta", "lamps");
 				return repository.findAll();
 	  }
 	  
@@ -43,7 +42,7 @@ public class MqttController {
 	    
 		System.out.println("Lamp " + id + "has been requested");
 		
-		mqttGateway.sendToMqtt("La lampada " + id + "e' stata richiesta", "out");
+		mqttGateway.sendToMqtt("La lampada " + id + " e' stata richiesta", "lamps/" + id);
 	    return repository.findById(id)
 	      .orElseThrow(() -> new LampNotFoundException(id));
 	  }
@@ -52,36 +51,38 @@ public class MqttController {
 	  @PutMapping("/lamps/{id}")
 	  ResponseEntity<?> update(@PathVariable Long id, @RequestBody String message)
 	  {
-		try {
+		  try {
 
-			Lamp temp = repository.findById(id).get();
-			JsonObject rq = new Gson().fromJson(message, JsonObject.class);
-			
-			String newStatus = rq.get("status").getAsString();
-			
-			System.out.println("Lamp status: " + temp.getStatus());
-			System.out.println("Message status: " + newStatus);
-			
-			if(!temp.getStatus().equals(newStatus))
-			{
-				temp.setStatus(newStatus);
-				repository.save(temp);
-				mqttGateway.sendToMqtt(newStatus, "lamps/" + id + "/stato");
-				return ResponseEntity.ok(new Gson().toJson("Eseguito l'update"));
-			}
-			else
-			{
-				return ResponseEntity.ok(new Gson().toJson("La lampadina è già in questo stato"));
-			}
-		}
-		catch(Exception ex)
-		{
-			return ResponseEntity.ok("Fallito l'update");
-		}
+			  Lamp temp = repository.findById(id).get();
+			  JsonObject rq = new Gson().fromJson(message, JsonObject.class);
+			  
+			  String newStatus = rq.get("status").getAsString();
+			  
+			  System.out.println("Current lamp status: " + temp.getStatus());
+			  System.out.println("Message status: " + newStatus);
+			  
+			  if(!temp.getStatus().equals(newStatus))
+			  {
+				  temp.setStatus(newStatus);
+				  repository.save(temp);
+				  mqttGateway.sendToMqtt(newStatus, "lamps/" + id + "/stato");
+				  System.out.println("Lamp status changed to: " + newStatus);
+				  return ResponseEntity.ok(new Gson().toJson("Eseguito l'update"));
+			  }
+			  else
+			  {
+				  System.out.println("Status unchanged");
+				  return ResponseEntity.ok(new Gson().toJson("La lampadina è già in questo stato"));
+			  }
+		  }
+		  catch(Exception ex)
+		  {
+			return ResponseEntity.ok(new Gson().toJson("Fallito l'update"));
+		  }
 	  }
 	  
 	  
-	  
+	  @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 	  @PostMapping("/addLamps")
 	  Lamp newLamp(@RequestBody Lamp newEmployee) {
 		  
