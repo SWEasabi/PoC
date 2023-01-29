@@ -26,8 +26,8 @@ public class mqttBeans {
 		MqttConnectOptions options = new MqttConnectOptions();
 
 		options.setServerURIs(new String[] { "tcp://localhost:1883" });
-		options.setUserName("admin");
-		String pass = "12345678";
+		options.setUserName("test_sweasabi");
+		String pass = "sweasabi";
 		options.setPassword(pass.toCharArray());
 		options.setCleanSession(true);
 
