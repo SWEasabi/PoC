@@ -2,7 +2,9 @@
 
 \section{Introduzione}
 
-Lo scopo dell'API è quello di fornire servizi REST alla pagina angular e comunicare con le applicazioni che vanno a svolgere la logica effettiva del progetto. In particolare, vengono offerte due GET (rispettivamente disponibili su Lamps e Lamps/id) e una PUT (anch'essa su Lamps/id). Nel progetto sarà presente un'ulteriore separazione tra API e servizi in modo da non esporli all'esterno (con l'API che si occuperà di verificare che la richiesta avvenga da un utente autorizzato e dirigendola verso la corretta applicazione), tuttavia essendo questo PoC puramente a scopo dimostrativo questa feature non è qui presente in quanto l'enfasi è stata posta sulla corretta comunicazione tra le diverse parti del progetto, ritenendo il processo di autenticazione vero e proprio superfluo in questo PoC (come confermato dal committente).
+Lo scopo dell'API è quello di fornire servizi REST alla pagina angular e comunicare con le applicazioni che vanno a svolgere la logica effettiva del progetto. In particolare, vengono offerte due GET, rispettivamente disponibili su Lamps e Lamps/id, e una PUT, anch'essa su Lamps/id.
+
+Nel progetto sarà presente un'ulteriore separazione tra API e servizi in modo da non esporli all'esterno\footnote{L'API che si occuperà di verificare che la richiesta avvenga da un utente autorizzato e dirigendola verso la corretta applicazione.}. Tuttavia essendo questo PoC puramente a scopo dimostrativo questa caratteristicha non è presente. Come concordato con il proponente, in questo prototipo l'enfasi è stata posta sulla corretta comunicazione tra le diverse parti del progetto, ritenendo il vero e proprio processo di autenticazione superfluo in questo PoC.
 
 \section{Funzionamento}
 
