@@ -1,0 +1,126 @@
+on:
+  push:
+    branches:
+      - docu-main
+  pull_request:
+    branches:
+      - docu-main
+      
+jobs:
+  build_docs:
+    runs-on: ubuntu-latest
+    name: Build Documents
+    steps:
+      - name: 🚧 Set up Git repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      
+      - name: ⚙ Build LaTeX files
+        run: |
+          docker run -i --rm -v "$(pwd)/:/work" -w /work ghcr.io/xu-cheng/texlive-full bash -c '
+            shopt -s globstar
+            set -e
+            for d_path in ./**/d_*.tex; do (
+              cd "$(dirname $d_path)"
+              latexmk -lualatex $(basename $d_path)
+            ) done'
+            
+      - name: 🧬 Generate artifact containing PDF files
+        uses: actions/upload-artifact@v3
+        with:
+          name: analisireq
+          path: "**/d_*.pdf"
+          
+  build_ghpages:
+    runs-on: ubuntu-latest
+    name: Build GitHub Pages
+    needs: build_docs
+    steps:
+      - name: 🚧 Set up Git repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+      
+      - name: ⬇ Download artifact analisireq
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: analisireq
+          path: ./analisireq
+          
+      - name: ✍ Remove prefix d_ in PDF files
+        run: find ./analisireq -type f -name 'd_*.pdf' | while read f; do mv "$f" "${f/d_/}"; done
+
+      - name: ⚒ Install apindex and update HTML template
+        run: |
+          git clone --depth=1 https://github.com/paperbenni/apindex.git
+          cd apindex
+          rm share/apindex/index.template.html
+          curl -o share/apindex/index.template.html https://raw.githubusercontent.com/SWEasabi/global-assets/main/html/ghpages_template.html
+          sed -i "34d; 35i Analisi dei requisiti" share/apindex/index.template.html
+          cmake . -DCMAKE_INSTALL_PREFIX=/usr
+          sudo make install
+          cd ..
+          rm -rf apindex
+        
+      - name: ⚙ Build static page
+        run: apindex ./analisireq
+        
+      - name: 🧬 Generate artifact containing Directory Listings Page
+        uses: actions/upload-artifact@v3
+        with:
+          name: analisireq_html
+          path: ./analisireq
+          
+  deploy_ghpages:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    name: Deploy GitHub Pages
+    needs: [build_docs, build_ghpages]
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: ⬇ Download artifact analisireq_html
+        uses: actions/download-artifact@v3
+        with:
+          name: analisireq_html
+          path: ./html
+      
+      - name: 🚧 Setup Github Pages
+        uses: actions/configure-pages@v2
+      
+      - name: 🧬 Generate github-pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./html
+      
+      - name: ⬆ Deploy artifact to GitHub Pages
+        uses: actions/deploy-pages@v1
+        
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    name: Release
+    needs: build_docs
+    steps:
+      - name: ⬇ Download artifact analisireq
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: analisireq
+          path: ./analisireq
+      
+      - name: ✍ Remove prefix d_ in PDF files
+        run: find ./analisireq -type f -name 'd_*.pdf' | while read f; do mv "$f" "${f/"/d_"/"/"}"; done
+        
+      - name: 🤐 Generate ZIP archive
+        run: zip -r analisireq.zip analisireq
+     
+      - name: 🎁 Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: analisireq.zip
