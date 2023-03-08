@@ -15,7 +15,7 @@
   <ng-container [ngSwitch]="vm.lampStatus?.status">
     <img *ngSwitchCase="'On'" src="../../assets/images/lamp2.png" alt="Lamp On">
     <img *ngSwitchCase="'Off'" src="../../assets/images/lamp.png" alt="Lamp Off">
-    <img *ngSwitchDefault src="../../assets/images/loading.jpg" alt="Lamp Off">
+    <img *ngSwitchDefault src="../../assets/images/loading.png" alt="Lamp Off">
   </ng-container>
   <h2>{{vm.lampStatus?.status}}</h2>
 </ng-container>
