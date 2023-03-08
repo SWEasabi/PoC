@@ -8,7 +8,7 @@ import { LampButtonComponent } from './lamp-button/lamp-button.component';
 @NgModule({
  declarations: [
    AppComponent,
-   LampButtonComponent
+   LampButtonComponent,
  ],
  imports: [
    BrowserModule,

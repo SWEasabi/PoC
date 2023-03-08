@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,OnInit,ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 
 @Component({
@@ -9,15 +9,8 @@ import { HttpClient } from "@angular/common/http";
 
 export class AppComponent {
  private data:any = []
- constructor(private http: HttpClient) {
-   
- }
+ constructor(private http: HttpClient,private cdr: ChangeDetectorRef) {}
+ 
 
- getData(){
-   const url ='http://localhost:8080/lamps'
-   this.http.get(url).subscribe((res)=>{
-     this.data = res
-     console.log(this.data)
-   })
- }
+
 }
