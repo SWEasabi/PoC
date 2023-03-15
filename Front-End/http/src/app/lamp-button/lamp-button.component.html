@@ -1,4 +1,22 @@
+<!-- <button (click)="toggleLamp()">
+  <ng-container *ngIf="lampStatus?.status === 'init'">
+    <img src="../../assets/images/loading.jpg" alt="Lamp Off">      
+  </ng-container>
+        <ng-container *ngIf="lampStatus?.status === 'on'">
+          <img src="../../assets/images/lamp.png" alt="Lamp On">
+        </ng-container>
+        <ng-container *ngIf="lampStatus?.status === 'off'">
+          <img src="../../assets/images/lamp2.png" alt="Lamp Off">
+        </ng-container>
+    </button>
+     -->
 <button (click)="toggleLamp()">
-    <img src="../../assets/images/lamp.png" alt="lamp">
+<ng-container *ngIf="{lampStatus: lampStatus$ | async } as vm">
+  <ng-container [ngSwitch]="vm.lampStatus?.status">
+    <img *ngSwitchCase="'On'" src="../../assets/images/lamp2.png" alt="Lamp On">
+    <img *ngSwitchCase="'Off'" src="../../assets/images/lamp.png" alt="Lamp Off">
+    <img *ngSwitchDefault src="../../assets/images/loading.png" alt="Lamp Off">
+  </ng-container>
+  <h2>{{vm.lampStatus?.status}}</h2>
+</ng-container>
 </button>
-    
